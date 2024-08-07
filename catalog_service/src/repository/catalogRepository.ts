@@ -2,7 +2,7 @@ import { ICatalogRepository } from "../interface/catalogRepositoryInterface";
 import { Product } from "../models/product_model";
 
 export class CatalogRepository implements ICatalogRepository {
-    create(data: Product): Promise<Product> {
+    create(data: Product) : Promise<Product> {
         
         const mockprod = {
             id: 1,
