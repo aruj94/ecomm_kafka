@@ -2,7 +2,6 @@ import request from "supertest";
 import express from "express";
 import catalogRouter, { catalogSerivce } from "../catalog_routes";
 import { faker } from '@faker-js/faker'
-import { Product } from "../../models/product_model";
 import { productFactory } from "../../utils/fixtures";
 
 const app = express();
@@ -113,6 +112,91 @@ describe("Catalog Routes", () => {
 
             expect(response.status).toBe(500);
             expect(response.body).toEqual("unable to update product");
+        });
+    });
+
+    describe("GET /products?limit=0&offset=0", () => {        
+        test("should get products by offset and limit", async () => {
+            const randomLimit = faker.number.int({ min: 10, max: 50});
+            const products = productFactory.buildList(randomLimit);
+
+            jest.spyOn(catalogSerivce, 'getProducts').mockImplementationOnce(() => Promise.resolve(products));
+
+            const response = await request(app)
+                .get(`/products?limit=${randomLimit}&offset=0`)
+                .set("Accept", "application/json");
+            
+            expect(response.status).toBe(200);
+            expect(response.body).toEqual(products);
+        });
+
+        test("should respond with a error code of 500 for internal server errors", async () => {
+            const randomLimit = faker.number.int({ min: 10, max: 50});
+
+            jest.spyOn(catalogSerivce, 'getProducts').mockImplementationOnce(() => Promise.reject(new Error("unable to get products")));
+
+            const response = await request(app)
+                .get(`/products?limit=${randomLimit}&offset=0`)
+                .set("Accept", "application/json");
+
+            expect(response.status).toBe(500);
+            expect(response.body).toEqual("unable to get products");
+        });
+    });
+
+    describe("GET /products/:id", () => {        
+        test("should get a product by id", async () => {
+            const product = productFactory.build();
+
+            jest.spyOn(catalogSerivce, 'getProduct').mockImplementationOnce(() => Promise.resolve(product));
+
+            const response = await request(app)
+                .get(`/products/${product.id}`)
+                .set("Accept", "application/json");
+
+            expect(response.status).toBe(200);
+            expect(response.body).toEqual(product);
+        });
+
+        test("should respond with a error code of 500 for internal server errors", async () => {
+            const product = productFactory.build();
+
+            jest.spyOn(catalogSerivce, 'getProduct').mockImplementationOnce(() => Promise.reject(new Error("unable to get product")));
+
+            const response = await request(app)
+                .get(`/products/${product.id}`)
+                .set("Accept", "application/json");
+
+            expect(response.status).toBe(500);
+            expect(response.body).toEqual("unable to get product");
+        });
+    });
+
+    describe("DELETE /products/:id", () => {        
+        test("should delete a product by id", async () => {
+            const product = productFactory.build();
+
+            jest.spyOn(catalogSerivce, 'deleteProduct').mockImplementationOnce(() => Promise.resolve(product));
+
+            const response = await request(app)
+                .delete(`/products/${product.id}`)
+                .set("Accept", "application/json");
+
+            expect(response.status).toBe(200);
+            expect(response.body).toEqual(product);
+        });
+
+        test("should respond with a error code of 500 for internal server errors", async () => {
+            const product = productFactory.build();
+
+            jest.spyOn(catalogSerivce, 'deleteProduct').mockImplementationOnce(() => Promise.reject(new Error("unable to delete product")));
+
+            const response = await request(app)
+                .delete(`/products/${product.id}`)
+                .set("Accept", "application/json");
+
+            expect(response.status).toBe(500);
+            expect(response.body).toEqual("unable to delete product");
         });
     });
 });
