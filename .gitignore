@@ -1,8 +1,7 @@
 catalog_service/dist
 catalog_service/node_modules
+order_Service/node_modules
 ecomm.code-workspace
-catalog_service/coverage/clover.xml
-catalog_service/coverage/coverage-final.json
-catalog_service/coverage/lcov.info
-catalog_service/coverage/lcov-report
+catalog_service/coverage
 db/db-data
+order_Service/coverage
