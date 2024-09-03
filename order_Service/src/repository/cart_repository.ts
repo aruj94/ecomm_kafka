@@ -1,7 +1,16 @@
+import { DB } from "../db/db_connection";
+import { carts } from "../db/schema";
+import { CartRepositoryInput } from "../DTO/cartRequest.dto";
 import { CartRepositoryType } from "../types/repository_types";
 
-const createCart = async (input: any): Promise<{}> => {
-    // read/write database
+const createCart = async (input: CartRepositoryInput): Promise<{}> => {
+    // connect to database
+    const result = await DB.insert(carts).values({
+        customerId: input.customerId,
+    }).returning({ cartId: carts.id });
+
+    console.log(result)
+
     return Promise.resolve({ 
         message: "mock response from create cart", 
         input: input}

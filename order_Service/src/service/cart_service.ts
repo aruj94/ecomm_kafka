@@ -1,6 +1,9 @@
-import { CartRepositoryType } from "../types/repository_types"
+import { CartRepositoryInput } from "../DTO/cartRequest.dto";
+import { CartRepositoryType } from "../types/repository_types";
 
-export const createCart = async (input: any, repo: CartRepositoryType) => {
+export const createCart = async (input: CartRepositoryInput, repo: CartRepositoryType) => {
+    // make a synchronous call to catalog microservice
+
     const data = await repo.create(input);
     return data;
 }
