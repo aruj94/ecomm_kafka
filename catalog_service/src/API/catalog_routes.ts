@@ -65,8 +65,7 @@ router.get("/products/:id", async (req: Request, res: Response, next: NextFuncti
         const data = await catalogSerivce.getProduct(id);
         return res.status(200).json(data);
     } catch(error) {
-        const err = error as Error;
-        return res.status(500).json(err.message);
+        return next(error);
     }
 });
 

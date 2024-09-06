@@ -1,11 +1,17 @@
 import { CartRepositoryInput } from "../DTO/cartRequest.dto";
 import { CartRepositoryType } from "../types/repository_types";
+import { getProductDetails, logger } from "../utils";
 
 export const createCart = async (input: CartRepositoryInput, repo: CartRepositoryType) => {
-    // make a synchronous call to catalog microservice
+    // make asynchronous call to catalog microservice
+    const product = await getProductDetails(input.productId);
+    logger.info(product);
 
-    const data = await repo.create(input);
-    return data;
+    if (product.stock < input.qty) {
+        throw new Error("product is out of stock");
+    }
+    
+    return product;
 }
 
 export const getCart = async (input: any, repo: CartRepositoryType) => {
