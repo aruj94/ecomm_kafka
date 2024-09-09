@@ -8,7 +8,7 @@ const router = express.Router();
 const repo = cartRepository
 
 router.get('/cart', async (req: Request, res: Response, next: NextFunction) =>{
-    const response = await getCart(req, repo);
+    const response = await getCart(req.body.customer_id, repo);
     return res.status(200).json(response);
 });
 
@@ -27,13 +27,15 @@ router.post('/cart', async (req: Request, res: Response, next: NextFunction) =>{
     }
 });
 
-router.patch('/cart', async (req: Request, res: Response, next: NextFunction) =>{
-    const response = await editCart(req, repo);
+router.patch('/cart/:lineItemId', async (req: Request, res: Response, next: NextFunction) =>{
+    const lineItemId = parseInt(req.params.lineItemId);
+    const response = await editCart({id: +lineItemId, qty: req.body.qty}, repo);
     return res.status(200).json(response);
 });
 
-router.delete('/cart', async (req: Request, res: Response, next: NextFunction) =>{
-    const response = await deleteCart(req, repo);
+router.delete('/cart/:lineItemId', async (req: Request, res: Response, next: NextFunction) =>{
+    const lineItemId = parseInt(req.params.lineItemId);
+    const response = await deleteCart(+lineItemId, repo);
     return res.status(200).json(response);
 });
 

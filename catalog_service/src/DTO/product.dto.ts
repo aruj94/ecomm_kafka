@@ -21,11 +21,8 @@ export class UpdateProductRequest{
 
     description?: String;
     
-    @IsOptional()
-    @Min(1)
     price?: number;
 
-    @IsOptional()
     @IsNumber()
     stock?: number;
 }

@@ -1,46 +1,85 @@
 import { DB } from "../db/db_connection";
-import { carts } from "../db/schema";
-import { CartRepositoryInput } from "../DTO/cartRequest.dto";
-import { CartRepositoryType } from "../types/repository_types";
+import { Cart, CartLineItem, cartLineItems, carts } from "../db/schema";
+import { NotFoundError } from "../utils";
+import { eq } from "drizzle-orm";
 
-const createCart = async (input: CartRepositoryInput): Promise<{}> => {
-    // connect to database
-    const result = await DB.insert(carts).values({
-        customerId: input.customerId,
-    }).returning({ cartId: carts.id });
+// decalre reporsitory types
+export type CartRepositoryType = {
+    createCart: (customerId: number, lineItems: CartLineItem) => Promise<number>;
+    findCart: (id: number) => Promise<Cart>;
+    updateCart: (id: number, qty: number) => Promise<CartLineItem>;
+    deleteCart: (id: number) => Promise<Boolean>;
+    clearCartData: (id: number) => Promise<Boolean>;
+};
 
-    console.log(result)
+export const createCart = async (
+    customerId: number,
+    { itemName, price, productId, qty, variant }: CartLineItem
+): Promise<number> => {
+    const result = await DB.insert(carts)
+        .values({
+            customerId: customerId,
+        })
+        .returning()
+        .onConflictDoUpdate({
+            target: carts.customerId,
+            set: { updatedAt: new Date() },
+        });
 
-    return Promise.resolve({ 
-        message: "mock response from create cart", 
-        input: input}
-    );
+    const [{ id }] = result;
+
+    if (id > 0) {
+        await DB.insert(cartLineItems).values({
+            cartId: id,
+            productId: productId,
+            itemName: itemName,
+            price: price,
+            qty: qty,
+            variant: variant,
+        });
+    }
+    return id;
+};
+
+export const findCart = async (id: number): Promise<Cart> => {
+    const cart = await DB.query.carts.findFirst({
+        where: (carts, { eq }) => eq(carts.customerId, id),
+        with: {
+          lineItems: true,
+        },
+      });
+
+    if (!cart) {
+        throw new NotFoundError("cart not found");
+    }
+
+    return cart;
+};
+
+export const updateCart = async (id: number, qty: number): Promise<CartLineItem> => {
+    const [CartLineItem] = await DB.update(cartLineItems)
+        .set({
+            qty: qty
+        })
+        .where(eq(cartLineItems.id, id))
+        .returning();
+    return CartLineItem;
+};
+
+export const deleteCart = async (id: number): Promise<boolean> => {
+    await DB.delete(cartLineItems).where(eq(cartLineItems.id, id)).returning();
+    return true;
 }
 
-const findCart = async (input: any): Promise<{}> => {
-    return Promise.resolve({
-        message: "mock response from find cart", 
-        input: input
-    });
-}
-
-const updateCart = async (input: any): Promise<{}> => {
-    return Promise.resolve({
-        message: "mock response from update cart", 
-        input: input
-    });
-}
-
-const deleteCart = async (input: any): Promise<{}> => {
-    return Promise.resolve({
-        message: "mock response from delete cart", 
-        input: input
-    });
-}
+const clearCartData = async (id: number): Promise<boolean> => {
+    await DB.delete(carts).where(eq(carts.id, id)).returning();
+    return true;
+};
 
 export const cartRepository: CartRepositoryType = {
-    create: createCart,
-    find: findCart,
-    update: updateCart,
-    delete: deleteCart
-}
+    createCart,
+    findCart,
+    updateCart,
+    deleteCart,
+    clearCartData
+};

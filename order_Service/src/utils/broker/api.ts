@@ -1,6 +1,6 @@
 import axios from "axios";
 import { logger } from "../logger";
-import { APIError } from "../error";
+import { APIError, NotFoundError } from "../error";
 import { Product } from "../../DTO/product.dto";
 
 const CATALOG_BASE_URL = process.env.CATALOG_URL || "http://localhost:8000";
@@ -11,6 +11,6 @@ export const getProductDetails = async (productId: number) => {
         return response.data as Product;
     } catch(error) {
         logger.error(error);
-        throw new APIError("product not found");
+        throw new NotFoundError("product not found");
     }
 };
