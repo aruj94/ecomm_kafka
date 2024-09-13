@@ -18,5 +18,5 @@ export type MessageBrokerType = {
     //consumer
     connectConsumer: <T>() => Promise<T>;
     disconnectConsumer: () => Promise<void>;
-    subscrible: (messageHandler: MessageHandler, topic: string) => Promise<void>;
+    subscrible: (messageHandler: MessageHandler, topic: TOPIC_TYPE) => Promise<void>;
 };
