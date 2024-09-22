@@ -24,7 +24,7 @@ export const ExpressApp = async () => {
     });
 
     // subscribe to the topic or publish a message
-    await MessageBroker.subscrible((message) => {
+    await MessageBroker.subscribe((message) => {
         console.log("Consumer reveive the message");
         console.log("Message received", message);
     }, "OrderEvents");
