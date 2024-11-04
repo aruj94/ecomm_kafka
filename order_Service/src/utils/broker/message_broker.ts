@@ -5,7 +5,7 @@ import { MessageType, OrderEvent, TOPIC_TYPE } from "../../types/subscription_ty
 // configuration properties
 const CLIENT_ID = process.env.CLIENT_ID || "order-service";
 const GROUP_ID = process.env.GROUP_ID || "order-service-group";
-const BROKERS = [process.env.BROKER_1 || "localhost:9092"];
+const BROKERS = [process.env.BROKER_1 || "localhost:9092"]; // specify additional brokers here
 
 const kafka = new Kafka({
     clientId: CLIENT_ID,
@@ -39,7 +39,7 @@ const createTopic = async (topic: string[]) => {
 };
 
 const connectProducer = async <T>(): Promise<T> => {
-    await createTopic(["orderEvents"]);
+    await createTopic(["orderEvents", "catalogEvents"]);
 
     if (producer) {
         console.log("Producer connected with pre-existing connection");

@@ -18,7 +18,7 @@ export const ExpressApp = async () => {
         console.log("producer connected");
     });
 
-    const consumer = await MessageBroker.connectConsumer<Consumer>();
+    /*const consumer = await MessageBroker.connectConsumer<Consumer>();
     consumer.on("consumer.connect", () => {
         console.log("consumer connected");
     });
@@ -27,7 +27,7 @@ export const ExpressApp = async () => {
     await MessageBroker.subscribe((message) => {
         console.log("Consumer reveive the message");
         console.log("Message received", message);
-    }, "OrderEvents");
+    }, "OrderEvents");*/
 
     app.use(order_router);
     app.use(cart_router);

@@ -3,9 +3,9 @@ import { CartEditRepositoryInput, CartRepositoryInput } from "../DTO/cartRequest
 import { CartRepositoryType } from "../repository/cart_repository";
 import { getProductDetails, logger, NotFoundError } from "../utils";
 
-export const createCart = async (input: CartRepositoryInput, repo: CartRepositoryType) => {
-    // make asynchronous call to catalog microservice
-    const product = await getProductDetails(input.productId);
+export const createCart = async (input: CartRepositoryInput, header: any, repo: CartRepositoryType) => {
+    // make synchronous call to catalog microservice
+    const product = await getProductDetails(input.productId, header);
     logger.info(product);
 
     if (product.stock < input.qty) {
