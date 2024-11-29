@@ -26,3 +26,16 @@ services:
       - POSTGRES_USER=order_db
     volumes:
       - ./db-data/order_postgres_server/:/var/lib/postgresql/data
+
+  user_postgres_server:
+    image: postgres:14.1-alpine
+    ports:
+      - "5434:5432"
+    deploy:
+      mode: replicated
+      replicas: 1
+    environment:
+      - POSTGRES_PASSWORD=user_db_password
+      - POSTGRES_USER=user_db
+    volumes:
+      - ./db-data/user_postgres_server/:/var/lib/postgresql/data
